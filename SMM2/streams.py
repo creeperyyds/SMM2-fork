@@ -49,6 +49,7 @@ class StreamIn:
         else:
             read = self.data[ self.position : self.position + length ]
             self.position += length
+        if length != 4: return read
         if not byteorder:
             if self.byteorder == BIG_ENDIAN:
                 return read
