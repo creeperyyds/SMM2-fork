@@ -1,11 +1,5 @@
 import codecs
-import numpy
-import struct
-from SMM2 import streams
-from SMM2 import encryption
-from SMM2 import keytables
-from SMM2 import actors
-from SMM2 import data
+import streams
 
 class Course:
     def __init__(self, data=None):

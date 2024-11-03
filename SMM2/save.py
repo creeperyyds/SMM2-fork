@@ -1,12 +1,6 @@
 import codecs
-import numpy
-import struct
 import enum
-import zlib
-from SMM2 import streams
-from SMM2 import encryption
-from SMM2 import keytables
-from SMM2 import data
+import streams
 
 class Save:
     def __init__(self, data=None):

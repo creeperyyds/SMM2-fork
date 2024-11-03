@@ -1,39 +1,39 @@
-from SMM2 import encryption
-from SMM2 import course
+from encryption import Save as EncryptedSave
+from save import Save as DecryptedSave
+from save import SLOT_STATUS
+from encryption import Course as EncryptedCourse
+from course import Course as DecryptedCourse
+from typing import List
+import yaml
 
-def main():
-        import sys
+def cls(): print('\033[2J\033[H', end='')
+config = yaml.safe_load(open("./config.yml", "r+"))
 
-        filename = sys.argv[1]
-        data = open(filename, "rb").read()
+if config == None: config = {}
 
-        SMM2Course = encryption.Course(data)
-        SMM2Course.decrypt()
-        SMM2Course = course.Course(SMM2Course.data)
+if "save_path" not in config:
+    print("The save path had not write.")
+    exit()
 
-        print(SMM2Course.HEADER.GAME_STYLE)
-        print(SMM2Course.HEADER.SAVE_DATE, SMM2Course.HEADER.SAVE_TIME)
-        print(SMM2Course.HEADER.NAME)
-        print(SMM2Course.HEADER.DESCRIPTION)
-        print(SMM2Course.HEADER.TIME_LIMIT)
+try:
+    encrypted_save = EncryptedSave(open(f'{config['save_path']}/save.dat', 'rb').read())
+    encrypted_save.decrypt()
+except:
+    print("The save path is not correct.")
+    exit()
 
-        for Actor in SMM2Course.OVERWORLD.ACTORS:
-                print(Actor.POSITION)
-                print(Actor.SIZE)
-                print(Actor.FLAGS)
-                print(Actor.EXTENDED_DATA)
-                print(Actor.TYPES)
-                print(Actor.LINK_ID)
-                print(Actor.OTOASOBI_ID)
+decrypted_save = DecryptedSave(encrypted_save.data)
+index = 0
+courses : List[DecryptedCourse] = []
+for course in decrypted_save.own_courses:
+    if course[1] == SLOT_STATUS.OCCUPIED:
+        encrypted_course = EncryptedCourse(open(f'{config['save_path']}/course_data_{str(course[0]).rjust(3, '0')}.bcd', 'rb').read())
+        encrypted_course.decrypt()
 
-        for Actor in SMM2Course.SUBWORLD.ACTORS:
-                print(Actor.POSITION)
-                print(Actor.SIZE)
-                print(Actor.FLAGS)
-                print(Actor.EXTENDED_DATA)
-                print(Actor.TYPES)
-                print(Actor.LINK_ID)
-                print(Actor.OTOASOBI_ID)
-
-if __name__ == "__main__":
-        main()
+        decrypted_course = DecryptedCourse(encrypted_course.data)
+        courses.append(decrypted_course)
+        print(f'{index}: {decrypted_course.HEADER.NAME}')
+        index += 1
+ind = int(input("Enter the course you want: "))
+cls()
+print(courses[ind].HEADER.DESCRIPTION)

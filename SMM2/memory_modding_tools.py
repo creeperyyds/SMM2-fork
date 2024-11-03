@@ -1,12 +1,10 @@
 # https://github.com/Treeki/CylindricalEarth/blob/master/pynoexs.py
 # https://github.com/Treeki/CylindricalEarth/blob/master/debug_tools.py
 
-import time
 import enum
 import struct
 import socket
 import threading
-from SMM2 import actors
 from SMM2.expression_evaluator import handle_evaluate_expression
 from SMM2.expressions import get_expressions
 
