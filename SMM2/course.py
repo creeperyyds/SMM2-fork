@@ -133,6 +133,45 @@ class CourseArea:
     def save(self):
         self.stream = streams.StreamOut()
         self.stream.byteorder = codecs.BOM_UTF16_LE
+        self.stream.write8(self.AREA_THEME)
+        self.stream.write8(self.AUTOSCROLL_TYPE)
+        self.stream.write8(self.SCREEN_BOUNDARY_FLAGS)
+        self.stream.write8(self.AREA_ORIENTATION)
+        self.stream.write8(self.END_LIQUID_HEIGHT)
+        self.stream.write8(self.LIQUID_MODE)
+        self.stream.write8(self.LIQUID_SPEED)
+        self.stream.write8(self.END_LIQUID_HEIGHT)
+        for value in self.BOUNDARIES.values(): self.stream.write32(value)
+        self.stream.write32(self.AREA_FLAGS)
+        self.stream.write32(self.ACTOR_COUNT)
+        self.stream.write32(self.OTOASOBI_COUNT)
+        self.stream.write32(self.SNAKE_BLOCK_COUNT)
+        self.stream.write32(self.CLEAR_DOKAN_COUNT)
+        self.stream.write32(self.NOBINOBI_PAKKUN_COUNT)
+        self.stream.write32(self.BLOCK_BIKKURI_COUNT)
+        self.stream.write32(self.ORBIT_BLOCK_COUNT)
+        self.stream.write(b'\x00\x00\x00\x00')
+        self.stream.write32(self.TILE_COUNT)
+        self.stream.write32(self.RAIL_COUNT)
+        self.stream.write32(self.ICICLE_COUNT)
+        actor_stream = streams.StreamOut()
+        for actor in self.ACTORS:
+            actor.save()
+            actor_stream.write(actor.data)
+        actor_stream.write(b'\x00' * (2600 - len(actor_stream.data)))
+        self.ACTOR_DATA = streams.StreamIn(actor_stream.data)
+        self.stream.write(actor_stream.data)
+        self.stream.write(self.OTOASOBI_DATA.data)
+        self.stream.write(self.SNAKE_BLOCK_DATA.data)
+        self.stream.write(self.CLEAR_DOKAN_DATA.data)
+        self.stream.write(self.NOBINOBI_PAKKUN_DATA.data)
+        self.stream.write(self.BLOCK_BIKKURI_DATA.data)
+        self.stream.write(self.ORBIT_BLOCK_DATA.data)
+        self.stream.write(self.TILE_DATA.data)
+        self.stream.write(self.RAIL_DATA.data)
+        self.stream.write(self.ICICLE_DATA.data)
+        self.data = self.stream.data
+        return self.data
 
 class Actor:
     def __init__(self, data=None):

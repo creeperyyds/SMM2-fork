@@ -22,18 +22,29 @@ except:
     print("The save path is not correct.")
     exit()
 
-decrypted_save = DecryptedSave(encrypted_save.data)
-index = 0
-courses : List[DecryptedCourse] = []
-for course in decrypted_save.own_courses:
-    if course[1] == SLOT_STATUS.OCCUPIED:
-        encrypted_course = EncryptedCourse(open(f'{config['save_path']}/course_data_{str(course[0]).rjust(3, '0')}.bcd', 'rb').read())
-        encrypted_course.decrypt()
+while True:
+    decrypted_save = DecryptedSave(encrypted_save.data)
+    index = 0
+    courses : List[DecryptedCourse] = [0] * 1000
+    for course in decrypted_save.own_courses:
+        if course[1] == SLOT_STATUS.OCCUPIED:
+            encrypted_course = EncryptedCourse(open(f'{config['save_path']}/course_data_{str(course[0]).rjust(3, '0')}.bcd', 'rb').read())
+            encrypted_course.decrypt()
 
-        decrypted_course = DecryptedCourse(encrypted_course.data)
-        courses.append(decrypted_course)
-        print(f'{index}: {decrypted_course.HEADER.NAME}')
-        index += 1
-ind = int(input("Enter the course you want: "))
-cls()
-print(courses[ind].HEADER.DESCRIPTION)
+            decrypted_course = DecryptedCourse(encrypted_course.data)
+            courses[index] = decrypted_course
+            print(f'{index}: {decrypted_course.HEADER.NAME}')
+            index += 1
+    ind = input("Enter the course you want to check (b for back): ")
+    cls()
+    if ind == 'b': break
+    ind = int(ind)
+    writing : DecryptedCourse = courses[ind]
+    while (op := input('Input b for back, 0 for modify head, 1 for modify overworld, 2 for modify subworld: ')) != 'b':
+        if len(op) > 1 or op[0] < '0' or op[0] > '2': 
+            print("No such operation")
+            continue
+        write : DecryptedCourse = (writing.HEADER, writing.OVERWORLD, writing.SUBWORLD)[int(op)]
+        for ind, item in enumerate(write.__dict__.items()):
+            key, value = item
+            print(f'{ind}-{key}:{value}')
